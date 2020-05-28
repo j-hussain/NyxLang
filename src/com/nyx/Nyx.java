@@ -73,6 +73,9 @@ public class Nyx {
 	}
 
 	static void error(String errorType, int errorLine) {
+		// This function seems slightly pointless for the time being, but it's good practice to
+		// differentiate the procedures that identify the error and the one that
+		// presents it to the users.
 		reportError("", errorType, errorLine);
 	}
 
