@@ -20,13 +20,62 @@ class Scanner {
 	private int initial = 0;
 	private int current = 0;
 
+	private char increment() {
+		// Subprocedure to move to the next lexeme
+		current++;
+		return instruction.charAt(current-1);
+	}
+
 	private void evaluateTokens() {
+		/*
+		This subprocedure considers the character of the lexeme, and creates relevant tokens based on
+		 */
 		char character = increment();
 		switch (character) {
-			case ';':
+			case ';': {
 				createToken(SEMICOLON);
 				break;
-
+			}
+			case '.': {
+				createToken(DOT);
+				break;
+			}
+			case ',': {
+				createToken(COMMA);
+				break;
+			}
+			case '+': {
+				createToken(PLUS);
+				break;
+			}
+			case '-': {
+				createToken(MINUS);
+				break;
+			}
+			case '/': {
+				createToken(FORWARD_SLASH);
+				break;
+			}
+			case '(': {
+				createToken(OPEN_BRACKET);
+				break;
+			}
+			case ')': {
+				createToken(CLOSE_BRACKET);
+				break;
+			}
+			case '{': {
+				createToken(OPEN_BRACE);
+				break;
+			}
+			case '}': {
+				createToken(CLOSE_BRACE);
+				break;
+			}
+			case '*': {
+				createToken(ASTERISK);
+				break;
+			}
 		}
 	}
 
