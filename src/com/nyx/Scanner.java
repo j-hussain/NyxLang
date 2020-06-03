@@ -20,10 +20,21 @@ class Scanner {
 	private int initial = 0;
 	private int current = 0;
 
+	// The next few methods before evaluateToken() are helper methods to aid the syntactic analysis
 	private char increment() {
-		// Subprocedure to move to the next lexeme
+		// Subprocedure to move to the next character in the source file and return it.
 		current++;
 		return instruction.charAt(current-1);
+	}
+
+	private void createToken(TokenIdentifier type) {
+		createToken(null, type);
+	}
+
+	private void createToken(Object literal, TokenIdentifier type) {
+		String text = source.substring(intial, current);
+		// Token(line no, lexeme, literal, type
+		tokens.add(new Token(line_number, text, literal, type));
 	}
 
 	private void evaluateTokens() {
@@ -52,10 +63,6 @@ class Scanner {
 				createToken(MINUS);
 				break;
 			}
-			case '/': {
-				createToken(FORWARD_SLASH);
-				break;
-			}
 			case '(': {
 				createToken(OPEN_BRACKET);
 				break;
@@ -76,6 +83,9 @@ class Scanner {
 				createToken(ASTERISK);
 				break;
 			}
+			default:
+				Nyx.error(line_number, "Unexpected character.");
+				break;
 		}
 	}
 
