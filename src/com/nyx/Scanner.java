@@ -10,7 +10,8 @@ import static com.nyx.nyx.TokenIdentifier.*;
 class Scanner {
 	/*
 	Scanner class for lexical analysis
-
+	The purpose of the class is to have methods which control the inner workings of the interpreter.
+	It handles the creation of Tokens, and their evaluation
 	 */
 	private final List<Token> tokens = new ArrayList<>();
 	private final String instruction;
@@ -20,9 +21,10 @@ class Scanner {
 	private int initial = 0;
 	private int current = 0;
 
-	// The next few methods before evaluateToken() are helper methods to aid the syntactic analysis
+	// A series of helper methods to aid the syntactic analysis
 	private char increment() {
 		// Subprocedure to move to the next character in the source file and return it.
+		// Ensures evaluateTokens() doesn't run forever
 		current++;
 		return instruction.charAt(current-1);
 	}
@@ -36,6 +38,24 @@ class Scanner {
 		// Token(line no, lexeme, literal, type
 		tokens.add(new Token(line_number, text, literal, type));
 	}
+
+	private void matchChar(String character) {
+		if (endOfLine()) {
+			return false;
+		}
+		if (instruction.charAt(current) != character) {
+			return false;
+		}
+		current++;
+		return true;
+	}
+
+	private char nextChar() {
+		// Similar to the increment() method however it just peaks the next character
+		if (endOfLine()) return '\0';
+		return instruction.charAt(current);
+	}
+}
 
 	private void evaluateTokens() {
 		/*
@@ -83,9 +103,38 @@ class Scanner {
 				createToken(ASTERISK);
 				break;
 			}
-			default:
+			case '>': {
+				createToken(matchChar('=') ? GREATER_THAN_OR_EQUAL : GREATER_THAN);
+				break;
+			}
+			case '<': {
+				createToken(matchChar('=') ? LESS_THAN_OR_EQUAL : LESS_THAN);
+				break;
+			}
+			case '=': {
+				createToken(matchChar("=") ? EQUAL_TO : EQUAL);
+				break;
+			}
+			case '!': {
+				createToken(matchChar('=') ? NOT_EQUAL_TO : NOT);
+				break;
+			}
+			// Handling a forward slash is somewhat different to the other characters
+			// as two consecutive slashes is how the language has comments (it is the defacto
+			// method of commenting after all)
+			case '/' : {
+				if (matchChar('/') {
+					while (!endOfLine() && nextChar() != '\n') {
+						increment();
+				} else {
+						createToken(FORWARD_SLASH);
+					}
+			}
+			// For characters the interpreter doesn't recognise (ie: "output@")
+			default: {
 				Nyx.error(line_number, "Unexpected character.");
 				break;
+			}
 		}
 	}
 
@@ -94,7 +143,7 @@ class Scanner {
 	}
 
 	List<Token> evaluateTokens() {
-		while (!endOfLine) {
+		while (!endOfLine()) {
 			initial = current;
 			evaluateTokens();
 		}
