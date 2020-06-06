@@ -52,10 +52,27 @@ class Scanner {
 
 	private char nextChar() {
 		// Similar to the increment() method however it just peaks the next character
+		// the matchChar() method is similar, but combines this lookahead function
+		// with the main script
 		if (endOfLine()) return '\0';
 		return instruction.charAt(current);
 	}
-}
+
+	private void evaluateString() {
+		while (!endOfLine() && nextChar() != '"') {
+			if (nextChar() == '\n') {
+				line_number++;
+			}
+			increment();
+		}
+		if (endOfLine()) {
+			Nyx.error("Unterminated string.", line_number);
+			return;
+		}
+		increment();
+
+		String
+	}
 
 	private void evaluateTokens() {
 		/*
@@ -119,6 +136,19 @@ class Scanner {
 				createToken(matchChar('=') ? NOT_EQUAL_TO : NOT);
 				break;
 			}
+			case '\n': {
+				line_number++;
+				break;
+			}
+			// \t is whitespace, the interpreter will ignore it
+			case '\t': {
+				break;
+			}
+			case '\r':
+			case '"': {
+				evaluateString();
+				break;
+			}
 			// Handling a forward slash is somewhat different to the other characters
 			// as two consecutive slashes is how the language has comments (it is the defacto
 			// method of commenting after all)
@@ -136,6 +166,7 @@ class Scanner {
 				break;
 			}
 		}
+	}
 	}
 
 	Scanner(String instruction) {
