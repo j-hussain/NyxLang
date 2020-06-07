@@ -34,7 +34,7 @@ class Scanner {
 	}
 
 	private void createToken(Object literal, TokenIdentifier type) {
-		String text = source.substring(intial, current);
+		String text = source.substring(initial, current);
 		// Token(line no, lexeme, literal, type
 		tokens.add(new Token(line_number, text, literal, type));
 	}
@@ -50,7 +50,7 @@ class Scanner {
 		return true;
 	}
 
-	private char nextChar() {
+	private char checkChar() {
 		// Similar to the increment() method however it just peaks the next character
 		// the matchChar() method is similar, but combines this lookahead function
 		// with the main script
@@ -59,8 +59,8 @@ class Scanner {
 	}
 
 	private void evaluateString() {
-		while (!endOfLine() && nextChar() != '"') {
-			if (nextChar() == '\n') {
+		while (!endOfLine() && checkChar() != '"') {
+			if (checkChar() == '\n') {
 				line_number++;
 			}
 			increment();
@@ -70,8 +70,34 @@ class Scanner {
 			return;
 		}
 		increment();
+		// This line removes the quotation marks from the string
+		String stringContent = instruction.substring(initial+1, current-1);
+		createToken(stringContent, STRING);
+	}
 
-		String
+	private boolean evaluateDigit(char x) {
+		// Returns boolean expression to see if it's a digit
+		return c <= '9' && c >= '0';
+	}
+
+	private void evaluateNumber() {
+		while (evaluateDigit(increment())) {
+			increment();
+		}
+		if (evaluateDigit(nextChar()) && checkChar() == '.') {
+			increment();
+			while (evaluateDigit(increment())) {
+				increment();
+			}
+		}
+		createToken(Double.parseDouble(instruction.substring(initial, current)), NUMBER);
+	}
+
+	private void nextChar() {
+		if (current+1 >= instruction.length()) {
+			return '\0';
+		}
+		return instruction.charAt(current+1);
 	}
 
 	private void evaluateTokens() {
@@ -154,7 +180,7 @@ class Scanner {
 			// method of commenting after all)
 			case '/' : {
 				if (matchChar('/') {
-					while (!endOfLine() && nextChar() != '\n') {
+					while (!endOfLine() && checkChar() != '\n') {
 						increment();
 				} else {
 						createToken(FORWARD_SLASH);
@@ -162,9 +188,12 @@ class Scanner {
 			}
 			// For characters the interpreter doesn't recognise (ie: "output@")
 			default: {
+				if (evaluateDigit(character)) {
+					evaluateNumber();
+				} else {
 				Nyx.error(line_number, "Unexpected character.");
+				}
 				break;
-			}
 		}
 	}
 	}
