@@ -15,18 +15,39 @@ class Scanner {
 	 */
 	private final List<Token> tokens = new ArrayList<>();
 	private final String instruction;
-
 	// Variables used for the offsets of the string format of the lexeme being analysed
 	private int line_number = 1;
 	private int initial = 0;
 	private int current = 0;
-
+	// HashMap for tying reserved words to functions
+	private static final Map<String, TokenIdentifier> keywords;
+	static {
+		keywords = new HashMap<>();
+		keywords.put("while", WHILE);
+		keywords.put("var", VAR);
+		keywords.put("true", TRUE);
+		keywords.put("false", FALSE);
+		keywords.put("super", SUPER);
+		keywords.put("return", RETURN;
+		keywords.put("print", PRINT);
+		keywords.put("or", OR);
+		keywords.put("null", NULL);
+		keywords.put("if", IF);
+		keywords.put("for", FOR);
+		keywords.put("else", ELSE);
+		keywords.put("class", CLASS);
+		keywords.put("and", AND);
+	}
 	// A series of helper methods to aid the syntactic analysis
 	private char increment() {
 		// Subprocedure to move to the next character in the source file and return it.
 		// Ensures evaluateTokens() doesn't run forever
 		current++;
 		return instruction.charAt(current-1);
+	}
+
+	private boolean endOfLine() {
+		return current >= instruction.length();
 	}
 
 	private void createToken(TokenIdentifier type) {
@@ -48,6 +69,28 @@ class Scanner {
 		}
 		current++;
 		return true;
+	}
+
+	private void evaluateIdentifier() {
+		while (isAlphaNumeric(checkChar())) {
+			increment()
+		}
+		// We check the instruction to see if there's an identifier in the string
+		// If not, we create a token as usual
+		String parseInstruction = instruction.substring(initial, current)
+		TokenIdentifier type = keywords.get(instruction);
+		if (type == null) {
+			type = IDENTIFIER;
+		}
+		createToken(type);
+	}
+
+	private boolean isAlphaNumeric(char c) {
+		return evaluateAlpha(c) || evaluateDigit(c)
+	}
+
+	private boolean evaluateAlpha(char c) {
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 	}
 
 	private char checkChar() {
@@ -184,12 +227,18 @@ class Scanner {
 						increment();
 				} else {
 						createToken(FORWARD_SLASH);
-					}
+					}}}
+			case 'o': {
+				if (checkChar() == 'r') {
+					createToken(OR);
+				}
 			}
 			// For characters the interpreter doesn't recognise (ie: "output@")
 			default: {
 				if (evaluateDigit(character)) {
 					evaluateNumber();
+				} else if {
+					evaluateIdentifier();
 				} else {
 				Nyx.error(line_number, "Unexpected character.");
 				}
@@ -211,11 +260,5 @@ class Scanner {
 		tokens.add(new Token(line_number, "", null, EOF));
 		return tokens;
 	}
-
-	private boolean endOfLine() {
-		return current >= instruction.length();
-	}
-
-
 
 }
